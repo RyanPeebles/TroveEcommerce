@@ -1,0 +1,6 @@
+@TroveApi_HostAddress = http://localhost:5082
+
+GET {{TroveApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
