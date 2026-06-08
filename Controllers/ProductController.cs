@@ -31,6 +31,8 @@ public class ProductController : ControllerBase
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
     }
+
+    
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, Product product)
     {
@@ -57,8 +59,8 @@ public class ProductController : ControllerBase
         return Ok(new { message = $"{updatedProducts.Count} products updated successfully." });
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(int id)
+    [HttpDelete("bulkDelete/{id}")]
+    public async Task<IActionResult> DeleteProductQuick(int id)
     {
         int rowsAffected = await _context.Products
         .Where(p => p.Id == id)
@@ -71,5 +73,20 @@ public class ProductController : ControllerBase
 
     return NoContent();
     }
-    
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProductSafe(int id)
+    {
+        var targetProduct = await _context.Products.FindAsync(id);
+
+        if (targetProduct == null)
+        {
+            return NotFound($"Product with ID {id} does not exist.");
+        }
+
+        _context.Products.Remove(targetProduct);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    } 
 }
