@@ -8,6 +8,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Configuration.AddUserSecrets<Program>();
         builder.Services.AddOpenApi();
         // Add services to the container.
         builder.Services.AddControllers();
