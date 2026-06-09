@@ -13,7 +13,7 @@ public class Product
 
     public double PriceModifier {get; set;} = 0.0;
 
-    public Seller Seller {get; set;} = null!;
+    public Seller? Seller {get; set;}
     public int SellerId {get; set;}
 
 

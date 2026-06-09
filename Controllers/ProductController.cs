@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using TroveApi.Data;
 using TroveApi.Models;
 
@@ -18,10 +19,27 @@ public class ProductController : ControllerBase
         _context = context;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+    [HttpGet("{id}")]
+    public async Task<ActionResult<IEnumerable<OutProductDTO>>> GetProducts(int id)
     {
-        return await _context.Products.ToListAsync();
+        var product = await _context.Products.Include(p => p.Seller).FirstOrDefaultAsync(p => p.Id == id);
+        if (product == null)
+        {
+            return BadRequest("Product not found");
+        }
+        var OutProdDTO = new OutProductDTO
+        {
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            StockQuantity = product.StockQuantity,
+            sellerName = product.Seller.Name
+
+        };
+
+        
+
+        return Ok(OutProdDTO);
     }
 
     [HttpPost]
@@ -32,6 +50,8 @@ public class ProductController : ControllerBase
         return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
     }
 
+ 
+    
     
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, Product product)
