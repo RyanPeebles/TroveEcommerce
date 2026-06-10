@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using TroveApi.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace TroveApi.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -13,5 +15,8 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products {get; set;}
     public DbSet<Seller> Sellers {get; set;}
 
-    public DbSet<User> Users {get; set;}
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+    }
 }

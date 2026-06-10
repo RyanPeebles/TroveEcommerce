@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TroveApi.Data;
@@ -12,39 +13,48 @@ namespace TroveApi.Controllers;
 
 public class UserController : ControllerBase
 {
+    private readonly UserManager<User> _userManager;
     private readonly AppDbContext _context;
 
-    public UserController(AppDbContext context)
+    public UserController(UserManager<User> userManager, AppDbContext context)
     {
+        _userManager = userManager;
         _context = context;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
-        return await _context.Users.ToListAsync();
+        return await _userManager.Users.ToListAsync();
     }
 
     [HttpPost]
     public async Task<ActionResult<User>> CreateUser([FromBody] UserDTO user)
     {
+        
         var newUser = new User
         {
             UserName = user.UserName,
             FirstName = user.FirstName,
             LastName = user.LastName 
         };
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
+        
+        var result = await _userManager.CreateAsync(newUser, user.password);
+
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
         return CreatedAtAction(nameof(CreateUser), new { id = newUser.Id }, newUser);
     } 
 
     [HttpPost("{userId}/Seller")]
-    public async Task<ActionResult<Seller>> CreateSellerFromUser([FromRoute] int userId,[FromBody] SellerDTO seller)
+    public async Task<ActionResult<Seller>> CreateSellerFromUser([FromRoute] string userId,[FromBody] SellerDTO seller)
     {
 
    
-        var userContext = await _context.Users.FindAsync(userId);
+        var userContext = await _userManager.FindByIdAsync(userId);
         if (userContext == null)
         {
             return BadRequest("User not found");

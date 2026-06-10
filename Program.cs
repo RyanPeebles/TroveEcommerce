@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using TroveApi.Data;
+using TroveApi.Models;
 
 namespace TroveApi;
 
@@ -16,6 +18,18 @@ public class Program
         // Your database configuration
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        
+        
+        builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 6;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+        })
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
+
 
         var app = builder.Build();
 
@@ -29,6 +43,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
 
