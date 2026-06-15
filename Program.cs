@@ -2,6 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using TroveApi.Data;
 using TroveApi.Models;
+using TroveApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace TroveApi;
 
@@ -22,15 +27,35 @@ public class Program
         
         builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
         {
+            options.User.RequireUniqueEmail = true;
             options.Password.RequireDigit = true;
             options.Password.RequiredLength = 6;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
+            options.SignIn.RequireConfirmedEmail = true;
         })
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+        builder.Services.AddTransient<IEmailSender, LocalEmailSender>();
 
+        builder.Services.AddScoped<ITokenService, TokenService>();
+        var secretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException("JWT Secret Key is missing!");
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            };
+        });
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
