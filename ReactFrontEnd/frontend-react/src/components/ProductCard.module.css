@@ -16,6 +16,7 @@
   margin: 0;
   font-size: 1.2rem;
   color: #333;
+  align-self:first baseline;
 }
 
 .imageContainer {
@@ -47,5 +48,6 @@
   margin: 0;
   border-top: 1px solid #eee;
   padding-top: 8px;
+  justify-self: left;
 }
 

@@ -17,8 +17,8 @@ function ProductCard({name, price, description, quantity, seller}){
                     <div>Stock: {quantity}</div>
                 </div>
                     
-                <div className='styles.sellerInfo'>
-                    <div> Sold by: {seller}</div>
+                <div className={styles.sellerInfo}>
+                    Sold by: {seller}
                 </div>
             </div>
         </div>
