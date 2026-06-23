@@ -6,6 +6,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Products from './pages/Products'
+import RegistrationPage from './pages/RegistrationPage'
 
 
 function NotFoundPage() { return <h2>😢 404 - Page Not Found</h2>; }
@@ -17,6 +18,7 @@ function App() {
       <nav style={{ padding: '10px', background: '#eee', display: 'flex', gap: '15px' }}>
         <a href="/">Home</a>
         <a href="/Products">Products</a>
+        <a href="/User/register">Register</a>
       </nav>
 
       {/* The router checks the URL and swaps out the component below dynamically */}
@@ -26,7 +28,7 @@ function App() {
         
         {/* If the URL path is "/products", display the ProductsPage */}
         <Route path="/Products" element={<Products />} />
-        
+        <Route path="/User/register" element={<RegistrationPage />} />
         {/* The "*" captures any broken/unknown URLs and shows a 404 page */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
