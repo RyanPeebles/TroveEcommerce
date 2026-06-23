@@ -38,6 +38,16 @@ public class Program
         .AddDefaultTokenProviders();
 
         builder.Services.AddTransient<IEmailSender, LocalEmailSender>();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("DevCorsPolicy", policy =>
+            {
+                policy.WithOrigins("http://localhost:5173")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+            });
+        });
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         var secretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException("JWT Secret Key is missing!");
@@ -66,8 +76,9 @@ public class Program
                 options.SwaggerEndpoint("/openapi/v1.json", "v1");
             });
         }
-
-        //app.UseHttpsRedirection();
+        app.UseRouting();
+        app.UseCors("DevCorsPolicy");
+        app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
